@@ -3,8 +3,8 @@ Script to load an mvnx
 
 """
 
-# import xml.etree.ElementTree as ET
-import lxml.etree as ET
+import xml.etree.ElementTree as ET
+# import lxml.etree as ET
 import collections
 import numpy as np
 from mvnx_file_accessor import MvnxFileAccessor
@@ -29,10 +29,13 @@ def load_mvnx(file_name):
     """
 
     mvnx_file = MvnxFileAccessor()
-    parser = ET.XMLParser(recover=True)
+    # parser = ET.XMLParser(recover=True)
     init_file_data(mvnx_file)
-    # tree = ET.parse(file_name)
-    tree = ET.parse(file_name, parser=parser)
+    try:
+        tree = ET.parse(file_name)
+    except ET.ParseError:
+        return None
+    # tree = ET.parse(file_name, parser=parser)
     root = tree.getroot()
 
     # Get the version
