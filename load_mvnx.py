@@ -35,6 +35,7 @@ def load_mvnx(file_name):
         tree = ET.parse(file_name)
     except ET.ParseError:
         return None
+
     # tree = ET.parse(file_name, parser=parser)
     root = tree.getroot()
 
@@ -60,7 +61,10 @@ def load_mvnx(file_name):
     # Parse the segments and their points
     segments_element = subject_element.find('mvn:segments', ns)
     segment_elements = segments_element.findall('mvn:segment', ns)
-    mvnx_file.file_data['segments'] = parse_segments(segment_elements)
+    returned_segments = parse_segments(segment_elements)
+    if returned_segments is None:
+        return None
+    mvnx_file.file_data['segments'] = returned_segments
     mvnx_file.create_index_to_segment_dict()  # for later convenience on retrieving segment names
 
     # Parse sensor information
@@ -223,6 +227,8 @@ def parse_segments(segment_elements):
             point_labels_from_index[point_index] = point_name
 
             pos_b = point_element.find('mvn:pos_b', ns)
+            if pos_b is None:
+                return None
             segment['points_mvn'][point_name] = np.array([float(pos) for pos in pos_b.text.split(' ')])
 
             # if the point offset is really small, consider it the origin (could just pick 1st or all 0's as well)
