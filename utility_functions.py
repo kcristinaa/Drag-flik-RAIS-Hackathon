@@ -17,7 +17,7 @@ def read_single_mvnx_to_df(mvnx_file, disable_print=False):
         segment_acc = mvnx_file.get_segment_acc(idx)
         df_temp = pd.DataFrame(segment_acc)
         df_temp = df_temp.add_prefix("{}_{}_".format(segment, "acc"))
-        df = df_temp
+        df = pd.concat([df, df_temp], axis=1)
 
         # add angualar accelaration
         segment_ang_acc = mvnx_file.get_segment_angular_acc(idx)
