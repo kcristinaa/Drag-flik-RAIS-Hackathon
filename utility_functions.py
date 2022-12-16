@@ -66,6 +66,9 @@ def read_mvnx_metadata(mvnx_file, file_name):
     # recording_date_formatted = datetime.strptime(recording_date, "%a %b %d %H:%M:%S.%f %Y")
     # year = recording_date_formatted.year
 
+    # get name from filepath
+    file_name = file_name.split("\\")[-1]
+
     # get sample number
     regex = r"(?:\(*(\d)\)*)(?:.mvnx)"
     result = re.search(regex, file_name)
@@ -81,12 +84,14 @@ def read_mvnx_metadata(mvnx_file, file_name):
     year = '20{}'.format(fn)
 
     # get user_gender
-    original_file_name = mvnx_file.original_file_name
-    if 'mannen' in original_file_name:
-        gender = 'M'
-    elif 'vrowen' in original_file_name:
-        gender = 'F'
-    else:
-        gender = np.NaN
+    # original_file_name = mvnx_file.original_file_name
+    # if 'mannen' in original_file_name:
+    #     gender = 'M'
+    # elif 'vrowen' in original_file_name:
+    #     gender = 'F'
+    # else:
+    #     print("Cannot find gender: {}".format(original_file_name))
+    #     gender = np.NaN
+    gender = np.NaN
 
     return year, id, sample, gender
