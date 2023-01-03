@@ -1,2 +1,2 @@
-# Drag-flik-RAIS-Hackathon
+# Drag-flick-RAIS-Hackathon
 RAIS-Hackathon
