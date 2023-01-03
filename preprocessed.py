@@ -4,6 +4,7 @@ from sklearn.decomposition import PCA, TruncatedSVD
 
 def create_train_validation_test_inference():
     merged = pd.read_pickle('mvnx_merged_data.pkl')
+    merged = merged.drop_duplicates()
 
     inference = merged[merged['speed'].isnull()]
     print(inference.head())
