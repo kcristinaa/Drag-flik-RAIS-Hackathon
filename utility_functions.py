@@ -95,3 +95,11 @@ def read_mvnx_metadata(mvnx_file, file_name):
     gender = np.NaN
 
     return year, id, sample, gender
+
+
+def get_year_from_filename(filename):
+    l = filename.split("\\")
+    year = l[2]
+    if 'A' in year or 'B' in year:
+        year = '2021'
+    return int(year)
