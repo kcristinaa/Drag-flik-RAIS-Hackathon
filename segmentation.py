@@ -5,9 +5,11 @@ from torch import nn
 from tqdm import tqdm
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 import matplotlib.pyplot as plt
+import seaborn as sns
+import pickle
 
 
 class MLP(nn.Module):
@@ -31,10 +33,6 @@ def plot_number_of_segments(df):
     for name, group in analytics:
         labels.append(f"{name[0]}-{name[1]}-{name[2]}")
         values.append(group["segment"].count())
-    plot_df = pd.DataFrame({
-        "Year-Id-Trial": labels,
-        "Segments count": values
-    })
     y_pos = range(len(labels))
     plt.figure(figsize=(150, 25))
     plt.bar(y_pos, values)
@@ -42,6 +40,18 @@ def plot_number_of_segments(df):
     plt.xlabel("Year-Id-Trial")
     plt.ylabel("Num. of Segments")
     plt.savefig("segments_count.png")
+
+
+def plot_heatmap_normalized(y_test, pred, class_names):
+    cm = confusion_matrix(y_test, pred)
+    conf_matrix_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    conf_matrix_norm = np.nan_to_num(conf_matrix_norm)
+    df_cm_norm = pd.DataFrame(conf_matrix_norm, index=class_names, columns=class_names)
+    sns.heatmap(df_cm_norm, annot=True)
+    plt.xlabel("Predicted class")
+    plt.ylabel("True class")
+    plt.title("HeatMap - Normalized")
+    plt.savefig("heatmap_normalized.png")
 
 
 if __name__ == "__main__":
@@ -52,9 +62,9 @@ if __name__ == "__main__":
          'LeftToe_angular_vel_1', 'LeftToe_angular_vel_2', 'LeftToe_ori_0', 'LeftToe_ori_1', 'LeftToe_ori_2',
          'LeftToe_ori_3', 'LeftToe_pos_0', 'LeftToe_pos_1', 'LeftToe_pos_2'], axis=1)
 
-    segments = data.loc[data["segment"].isin(["T2", "T3", "T4", "T5"])]
-    # plot_number_of_segments(segments)
-    # exit()
+    class_names = ["T2", "T3", "T4", "T5"]
+    segments = data.loc[data["segment"].isin(class_names)]
+    plot_number_of_segments(segments)
 
     le = LabelEncoder()
     le.fit(segments["segment"])
@@ -62,8 +72,7 @@ if __name__ == "__main__":
 
     # "time", "year", "id", "sample", "speed", "key", "segment"
     X_train, X_test, y_train, y_test = train_test_split(
-        # segments[segments.columns.difference(["year", "id", "sample", "speed", "key", "segment"])],
-        segments[segments.columns.difference(["segment"])],
+        segments[segments.columns.difference(["year", "id", "sample", "speed", "key", "segment"])],
         OneHotEncoder(sparse=False).fit_transform(integer_encoded.reshape(len(integer_encoded), 1)),
         random_state=0,
         shuffle=False,
@@ -103,3 +112,5 @@ if __name__ == "__main__":
     pred = np.argmax(net(X_test).to("cpu").detach().numpy(), axis=1)
     score = f1_score(y_test, pred, average="micro")
     print(f"F1: {score}")
+
+    plot_heatmap_normalized(y_test, pred, class_names)
