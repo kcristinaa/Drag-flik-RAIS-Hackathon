@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 #time the code 
 start = time.time()
 
+#################################################################################################
+# Eva's dataframe - merged data + 5 extra features  
+
 # READ THE pcl FILE
 df_merged_added_features = pd.read_pickle(
     'C:/Users/nickg/Desktop/Hackathon/final_without_NaNs_df.pkl')
@@ -86,7 +89,7 @@ f_importance = sort_dict_by_value(f_importance, True)
 # plot the most important features in descending order
 importance_df = pd.DataFrame.from_dict(data=f_importance, 
                                     orient='index')
-importance_df_top_10 = importance_df.head(100) 
+importance_df_top_10 = importance_df.head(10) 
 importance_df_top_10.plot.bar()
 plt.tight_layout()
 plt.legend('I',loc='best',prop={'size': 12})
@@ -102,17 +105,18 @@ top10 = list(importance_df_top_10.columns)
 # Model with the top () features 
 # Beacause of the stochastic nature of the XGB we iterated several times the FI pipeline 3 and we selected the following 
 
-#those columns correspond to the sensors : 
-df_merged_added_features_most_imp_feat = df_merged_added_features.loc[:, ['max_knee_angle', 'RightUpperLeg_pos_2mean',
+#those columns correspond to the sensors : L3, Right Upper Leg, Left Upper Arm, Left Shoulder, Right Foot, Right Shoulder, Right Foot,Right Toe, Right Upper Arm 
+#those columns correspond to the extra added features : max knee angle 
+df_merged_added_features_10_most_imp_feat = df_merged_added_features.loc[:, ['max_knee_angle', 'RightUpperLeg_pos_2mean',
                                        'L3_pos_2mean', "LeftUpperArm_angular_acc_2std", 'LeftShoulder_vel_1std',
                                         'RightShoulder_vel_1std', 'RightFoot_vel_1mean', 'LeftShoulder_acc_1std',
                                        'RightUpperArm_pos_2mean', 'RightToe_vel_1mean', 'speed']]
-print(df_merged_added_features_most_imp_feat.head(2))
-print(df_merged_added_features_most_imp_feat.shape)
-print(df_merged_added_features_most_imp_feat.columns)
+# print(df_merged_added_features_10_most_imp_feat.head(10))
+# print(df_merged_added_features_10_most_imp_feat.shape)
+# print(df_merged_added_features_10_most_imp_feat.columns)
 
 
-train, test = train_test_split(df_merged_added_features_most_imp_feat, test_size=0.2)
+train, test = train_test_split(df_merged_added_features_10_most_imp_feat, test_size=0.2)
 
 train_data = train.values
 test_data = test.values
@@ -124,60 +128,66 @@ X_test, y_test = test_data[:, :-1], test_data[:, -1]
 model = XGBRegressor(n_estimators=1000, max_depth=10, learning_rate=0.01,  eta=0.1, subsample=0.7, colsample_bytree=0.7)
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
+
+#predictions
 mse = mean_squared_error(y_test, y_pred)
-r2_score = r2_score(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
 mae = mean_absolute_error(y_test, y_pred)
 print("MSE: %.2f" % mse)
 print("RMSE: %.2f" % (mse**(1/2.0)))
-print("R2: %.2f" % r2_score)
+print("R2: %.2f" % r2)
 print("MAE: %.2f" % mae)
 
 
 
 ################################################################################################################################
+# Christina's dataframe - merged data 
 
-# # READ THE pcl FILE
-# df_merged = pd.read_pickle(
-#     'C:/Users/nickg/Desktop/Hackathon/final_dataframe.pkl')
+# READ THE pcl FILE
+df_merged = pd.read_pickle(
+    'C:/Users/nickg/Desktop/Hackathon/final_dataframe.pkl')
 
-# # the sensors that correspond to our top 10 variables --> LeftUpperArm, LeftLowerLeg, LeftShoulder, RightForeArm, RightLowerLeg
-#                                                         # LeftFoot, RightHand, RightFoot, T12, RightUpperArm
-# df_merged_most_10imp_feat = df_merged.loc[:, ['LeftUpperArm_angular_acc_2std', 'LeftLowerLeg_pos_2mean',
-#                                        'RightHand_vel_1std', "LeftFoot_vel_1std", 'LeftShoulder_acc_1std',
-#                                         'RightUpperArm_pos_2mean', 'T12_pos_2mean', 'RightFoot_vel_1std',
-#                                        'RightLowerLeg_pos_2mean', 'RightForeArm_vel_1std', 'speed']]
-
-# print(df_merged_most_10imp_feat.head(2))
-# # print(df_most_10imp_feat.shape)
-
-# train, test = train_test_split(df_merged_most_10imp_feat, test_size=0.2)
-
-# train_data = train.values
-# test_data = test.values
-
-# X_train, y_train = train_data[:, :-1], train_data[:, -1]
-# X_test, y_test = test_data[:, :-1], test_data[:, -1]
-
-# # model
-# model = XGBRegressor(n_estimators=1000, max_depth=10, learning_rate=0.01,  eta=0.1, subsample=0.7, colsample_bytree=0.7)
-# model.fit(X_train, y_train)
-# y_pred = model.predict(X_test)
-# mse = mean_squared_error(y_test, y_pred)
-# r2_score = r2_score(y_test, y_pred)
-# mae = mean_absolute_error(y_test, y_pred)
-# print("MSE: %.2f" % mse)
-# print("RMSE: %.2f" % (mse**(1/2.0)))
-# print("R2: %.2f" % r2_score)
-# print("MAE: %.2f" % mae)
+#those columns correspond to the sensors : L3, Right Upper Leg, Left Upper Arm, Left Shoulder, Right Foot, 
+#                                           Right Shoulder, Right Foot,Right Toe, Right Upper Arm, Left Hand 
+df_merged_10_most_imp_feat = df_merged.loc[:, ['LeftHand_vel_1std', 'RightUpperLeg_pos_2mean',
+                                       'L3_pos_2mean', "LeftUpperArm_angular_acc_2std", 'LeftShoulder_vel_1std',
+                                        'RightShoulder_vel_1std', 'RightFoot_vel_1mean', 'LeftShoulder_acc_1std',
+                                       'RightUpperArm_pos_2mean', 'RightToe_vel_1mean', 'speed']]
 
 
-# # Results
-# # MSE: 28.61
-# # RMSE: 5.35
-# # R2: 0.72
-# # MAE: 3.83
+# print(df_merged_10_most_imp_feat.head(10))
+# print(df_merged_10_most_imp_feat.shape)
 
-# end = time.time()
-# print(end - start)
+train, test = train_test_split(df_merged_10_most_imp_feat, test_size=0.2)
+
+train_data = train.values
+test_data = test.values
+
+X_train, y_train = train_data[:, :-1], train_data[:, -1]
+X_test, y_test = test_data[:, :-1], test_data[:, -1]
+
+# model
+model = XGBRegressor(n_estimators=1000, max_depth=10, learning_rate=0.01,  eta=0.1, subsample=0.7, colsample_bytree=0.7)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+#predictions
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+mae = mean_absolute_error(y_test, y_pred)
+print("MSE: %.2f" % mse)
+print("RMSE: %.2f" % (mse**(1/2.0)))
+print("R2: %.2f" % r2)
+print("MAE: %.2f" % mae)
+
+
+# Results 
+# MSE: 41.29
+# RMSE: 6.43
+# R2: 0.55
+# MAE: 4.62
+
+end = time.time()
+print(end - start)
 
 
