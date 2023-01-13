@@ -55,7 +55,7 @@ def plot_heatmap_normalized(y_test, pred, class_names):
 
 
 if __name__ == "__main__":
-    data = pd.read_pickle("data/mvnx_merged_data_har_without_null.pkl")
+    data = pd.read_pickle("data/mvnx_ballspeed_segmentation.pkl")
     data = data.drop(
         ['gender', 'LeftToe_acc_0', 'LeftToe_acc_1', 'LeftToe_acc_2', 'LeftToe_angular_acc_0', 'LeftToe_angular_acc_1',
          'LeftToe_angular_acc_2', 'LeftToe_vel_0', 'LeftToe_vel_1', 'LeftToe_vel_2', 'LeftToe_angular_vel_0',
